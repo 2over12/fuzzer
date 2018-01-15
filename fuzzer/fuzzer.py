@@ -64,7 +64,7 @@ class Fuzzer(object):
         self, binary_path, work_dir, afl_count=1, library_path=None, time_limit=None, memory="8G",
         target_opts=None, extra_opts=None, create_dictionary=False,
         seeds=None, crash_mode=False, never_resume=False, qemu=True, stuck_callback=None,
-        force_interval=None, job_dir=None
+        force_interval=None, job_dir=None, p_hander=None
     ):
         '''
         :param binary_path: path to the binary to fuzz. List or tuple for multi-CB.
@@ -93,6 +93,7 @@ class Fuzzer(object):
         self.memory         = memory
         self.qemu           = qemu
         self.force_interval = force_interval
+
 
         Fuzzer._perform_env_checks()
 
@@ -651,6 +652,8 @@ class Fuzzer(object):
             os.environ['QEMU_LD_PREFIX'] = path
 
     def _timer_callback(self):
+        if p_hander not None:
+            p_handler.update(self)
         if self._stuck_callback is not None:
             # check if afl has pending fav's
             if ('fuzzer-master' in self.stats and 'pending_favs' in self.stats['fuzzer-master'] and \
